@@ -1,0 +1,100 @@
+\documentclass[10pt]{article}
+\usepackage[polish]{babel}
+\usepackage{array}
+\usepackage[
+    starfontserif % comment for sans glyphs
+    ]{starfont}
+\usepackage{longtable}
+\usepackage{amsmath}
+\selectlanguage{polish}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{graphicx}
+\addtolength{\oddsidemargin}{-.75in}
+\addtolength{\evensidemargin}{-.75in}
+\addtolength{\textwidth}{1.5in}
+%\addtolength{\topmargin}{-.875in}
+%\addtolength{\textheight}{1.75in}
+
+% \DeclareMathSymbol{\mathJupiter}{\mathord}{starfontsym}{106}
+
+\title{3D Gas model}
+\author{Maciej Stańczyk}
+\date{\today}
+
+\begin{document}
+\maketitle
+\section{1-on-1 elastic collision}
+\subsection{Detecting collision}
+The collision within the next step $t\in(0,\Delta t]$ is detected using the condition that at a time $t$ the centers of mass of the two particles 1 and 2 are at the exact distance $r_1+r_2$ where $r_1$ and $r_2$ are radii of the repsective particles.
+
+Position of the first particle at time $t$ is:
+\begin{equation}\label{parametric1}
+    \mathbf{X_1}(t) = \mathbf{\hat X_1} + \mathbf{V_1}t 
+\end{equation}
+where the hat denotes initial position (at time $t=0$) and $u$, $v$ and $w$ are velocity components.
+
+The position of the second particle can be derived similarly. The condition that the particles are touching can be now derived:
+$$
+    \left[\mathbf{\hat X_1} -\mathbf{\hat X_2} + t(\mathbf{V_1} - \mathbf{V_2})\right]\cdot
+    \left[\mathbf{\hat X_1} -\mathbf{\hat X_2} + t(\mathbf{V_1} - \mathbf{V_2})\right] = (r_1+r_2)^2
+$$
+introducing notation:
+\begin{eqnarray*}
+  \mathbf{\delta \hat x} = \mathbf{\hat X_1} - \mathbf{\hat X_2},\\
+  \mathbf{\delta V} = \mathbf{V_1} - \mathbf{V_2},
+\end{eqnarray*}
+one has:
+\begin{equation}
+    \left[\mathbf{\delta \hat x} + t\mathbf{\delta V}\right]\cdot
+    \left[\mathbf{\delta \hat x} + t\mathbf{\delta V}\right] = (r_1+r_2)^2
+\end{equation}
+
+Solving for $t$ one gets the quadratic:
+\begin{equation}
+ t^2(\mathbf{\delta V}\cdot\mathbf{\delta V})
+ + t(2\mathbf{\delta V}\cdot\mathbf{\delta \hat X})
+ + (\mathbf{\delta \hat X}\cdot\mathbf{\delta \hat X}) - (r_1+r_2)^2 
+= 0
+\end{equation}
+This is solved in a standard method. If a solution exists for $t\in(0,\Delta t]$, the smaller one is selected (in case there are two). This time $t_c$ determines the instant of the collision. Equation \ref{parametric1} can be used to determine collision location.
+
+\subsection{Collision energy and momentum transfer}
+The collision momentum and energy transfer for a fully elastic collision is described by conditions of momentum and energy conservation. Before formulating those, we introduce new inertial coordinate system $\bar X$ such as:
+\begin{equation}
+    \mathbf{\bar X}  = \mathbf{X} - \mathbf{V_2} (t-t_c)
+\end{equation}
+where velocity $\mathbf{V_2}$ of the second particle is taken before the collision. By differentiating these equations for the second particle we see that it is stationary prior to the collision in this new coordinate system.
+
+Position of the first particle in this system is, after substituting equation \ref{parametric1}:
+$$
+  \mathbf{\bar X_1}  = 
+  \mathbf{\hat X_1} + t\mathbf{\delta V} +t_c \mathbf{V_2}
+$$
+and its velocity is obviously:
+$$
+\mathbf{\bar V_1} = \mathbf{\delta V}
+$$
+The versor $\mathbf{\bar p}$ is introduced, defining the direction from the center of particle 1 to center of particle 2 at the moment of collision:
+$$
+\mathbf{\bar p} = -\frac{1}{r_1+r_2}(\mathbf{\delta \hat X}+t_c\mathbf{\delta V})
+$$
+Now we define the conservation laws in the inertial coordinate system $\bar X$:
+\begin{eqnarray}
+    m_1\mathbf{\bar V_1} & = & m_1\mathbf{\bar V_{1c}} + m_2 \mathbf{\bar V_{2c}} \\
+    m_1(\mathbf{\bar V_1}\cdot\mathbf{\bar V_1}) & = &  m_1(\mathbf{\bar V_{1c}}\cdot\mathbf{\bar V_{1c}}) + m_2 k_c^2\\
+    \mathbf{\bar V_{2c}}& = & k_c\mathbf{\bar p}
+\end{eqnarray}
+where the added index $c$ denotes velocities after collision and $k_c$ indicates the speed of the second particle after collision.
+
+The first equation is momentum conservation, the second expresses energy conservation, the last simply captures the fact, that after the collision the second particle will depart along the direction $\mathbf{\bar p}$. These need to be solved for $\mathbf{V_{1c}}$ and $\mathbf{V_{2c}}$ ($k_c$ is also unknown).
+
+Introducing notation $\varphi = \frac{m_2}{m_1}$, using that $k_c\neq0$, and noting that, by definition of versor $\mathbf{\bar p}\cdot\mathbf{\bar p}=1$:
+\begin{eqnarray*}
+    k_c & =&  \frac{2\left(\mathbf{\bar v_1} \cdot \mathbf{\bar p}\right)}{\varphi +  1} \\
+    \mathbf{ \bar v_{1c}} & = &\mathbf{ \bar v_1} - \varphi k_c \mathbf{ \bar p} \\
+    \mathbf{ \bar v_{2c}} & = & k_c \mathbf{ \bar p}
+\end{eqnarray*}
+
+
+\end{document}
